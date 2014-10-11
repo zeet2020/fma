@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html ng-app="fma">
+  <head>
+    <meta charset="utf-8">
+    <title>FMA</title>
+
+    <!-- Sets initial viewport load and disables zooming  -->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+
+    <!-- Makes your prototype chrome-less once bookmarked to your phone's home screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <!-- Include the compiled Ratchet CSS -->
+    <link href="/css/ratchet.css" rel="stylesheet">
+
+    <!-- Optionally, include either the iOS or Android theme -->
+    <link href="/css/ratchet-theme-ios.min.css" rel="stylesheet">
+
+    <!-- Include the compiled Ratchet JS -->
+    <script src="/js/ratchet.js"></script>
+  </head>
+  <body ng-controller="mainCtrl">
+
+    
+    <header class="bar bar-nav">
+      <a class="icon icon-search pull-right" href="#search" ></a>
+      <h1 class="title">Z Tunes</h1>
+	  <a class="icon icon-info" href="#about" ></a>
+    </header>
+
+    <!-- Wrap all non-bar HTML in the .content div (this is actually what scrolls) -->
+    <div class="content">
+      <!-- <div class="content-padded">
+        <h3>Ratchet Example App</h3>
+        <p>Use this Ratchet mobile app template to build web apps that feel native.</p>
+      </div>-->
+	  
+	  <div class="segmented-control">
+  <a class="control-item active" href="#genres">
+    Genres
+  </a>
+  <a class="control-item" href="#artists">
+    Artists
+  </a>
+  <a class="control-item" href="#albums">
+    Albums
+  </a>
+  <a id="songstab" ng-show="activeSongParamObj" class="control-item" href="#songs">
+    Songs
+  </a>
+  <a id="playtab" ng-show="activeTrack" class="control-item" href="#play">
+    playing..
+  </a>
+  </div>
+
+	  <div ng-view> </div>
+      
+
+    </div>
+
+    <!-- Settings Modal -->
+	<div id="about" class="modal">
+	<header class="bar bar-nav">
+        <a class="icon icon-close pull-right" href="#about"></a>
+        <h1 class="title">About</h1>
+      </header>
+	   <div class="content content-padded">
+	   <h4>Z tunes</h4>
+	   <p>Z tunes uses the data from Free Music archives and list the content effectively</p>
+	   <p>please send your comments to opensrcproject@gmail.com</p>
+	   </div>
+	</div>
+    <div id="search" class="modal">
+      <header class="bar bar-nav">
+        <a class="icon icon-close pull-right" href="#search"></a>
+        <h1 class="title">Search For Tracks</h1>
+      </header>
+
+      <div class="content">
+	  <!--- class="input-group" -->
+        <form >
+          
+  <input type="text" ng-model="query" placeholder="search">
+  
+  <button ng-click="search(query)" class="btn btn-positive btn-block">Search</button>
+
+        </form>
+
+        <!-- <h5 class="content-padded">App settings</h5>
+
+        <ul class="table-view">
+          <li class="table-view-cell media">
+            <span class="media-object pull-left icon icon-sound"></span>
+            <div class="media-body">
+              Enable sounds
+            </div>
+            <div class="toggle">
+              <div class="toggle-handle"></div>
+            </div>
+          </li>
+          <li class="table-view-cell media">
+            <span class="media-object pull-left icon icon-person"></span>
+            <div class="media-body">
+              Parental controls
+            </div>
+            <div class="toggle">
+              <div class="toggle-handle"></div>
+            </div>
+          </li>
+        </ul>
+        <div class="content-padded">
+          <button class="btn btn-positive btn-block">Save settings</button>
+        </div> -->
+      </div>
+    </div>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
+	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.js"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.js"></script>
+	<script src="http://code.angularjs.org/1.2.15/angular-route.js"></script>
+<script>
+$(function(){
+$('nav.bar > a').click(function(e){
+   $(this).parent().find('a').removeClass('active');
+   $(this).addClass('active');
+});
+
+
+});
+</script>
+
+<script>
+var api_key = " api key ";
+var base_url = "http://freemusicarchive.org/api/get";
+fma = angular.module("fma",['ngRoute']);
+
+
+fma.config(['$routeProvider',function($routeProvider){
+$routeProvider.
+    when('/',{
+	templateUrl:'partials/genres.html',
+	
+	}).
+	when('/genres',{
+	templateUrl:'partials/genres.html',
+	
+	}).
+	when('/artists',{
+	templateUrl:'partials/artists.html',
+	
+	}).
+	when('/albums',{
+	templateUrl:'partials/albums.html',
+	
+	}).
+	when('/songs',{
+	templateUrl:'partials/songs.html',
+	
+	}).
+	when('/play',{
+	templateUrl:'partials/player.html',
+	
+	}).
+	otherwise({
+	redirectTo: '/'
+	});
+
+
+}]);
+
+fma.controller("mainCtrl",function($scope,$location,$window,$http,fmaService,$sce){
+    
+    $scope.yo = function(){ alert("yoo"); };
+   
+   
+   $scope.genres_data = {dataset:[],page:1};
+   $scope.albums_data = {dataset:[],page:1};
+   $scope.artists_data = {dataset:[],page:1};
+   $scope.tracks_data  = {dataset:[],page:1};
+   $scope.genres = function(page){
+       
+	   
+	   
+	   page = page || $scope.genres_data.page;
+	   
+		fmaService.genres({page:page}).success(function(res){
+		    console.log(res);
+			$scope.genres_data.total_pages = res.total_pages;
+			$scope.genres_data.dataset = _.union($scope.genres_data.dataset,res.dataset);
+            $scope.genres_data.page = parseInt(res.page);
+		});
+ 
+   };
+
+   $scope.albums = function(page){
+		 page = page || $scope.albums_data.page;
+		fmaService.albums({page:page}).success(function(res){
+			$scope.albums_data.total_pages = res.total_pages;
+			$scope.albums_data.dataset = _.union($scope.albums_data.dataset,res.dataset);
+            $scope.albums_data.page = res.page;
+		});
+   };
+   
+   $scope.artists = function(page){
+		page = page || $scope.artists_data.page;
+		fmaService.artists({page:page}).success(function(res){
+			$scope.artists_data.total_pages = res.total_pages;
+			$scope.artists_data.dataset = _.union($scope.artists_data.dataset,res.dataset);
+            $scope.artists_data.page = res.page;
+		});
+		
+   };
+   
+   $scope.songs = function(obj,page){
+        $scope.songspage = true;
+		$('.segmented-control > a').removeClass('active');
+		$('.segmented-control > a#songstab').addClass('active');
+        $scope.tracksPage = true;
+		var reqparam = {};
+		
+		if(obj.genre_id){
+			reqparam = {'genre_id':obj.genre_id};  
+		}else if(obj.artist_id){
+			reqparam = {'artist_id':obj.artist_id};
+		}else if(obj.album_id){
+			reqparam = {'album_id':obj.album_id}; 
+		} else if(obj.q){
+		    reqparam = {'q':obj.q};
+		}
+		 reqparam['page'] = page || $scope.tracks_data.page;
+		 var changed = $scope.activeSongParamObj == obj ? false: true; 
+		$scope.activeSongParamObj = obj; 
+        fmaService.tracks(reqparam).success(function(res){
+		    
+			$scope.tracks_data.total_pages = res.total_pages;
+			if(changed){
+			$scope.tracks_data.dataset = res.dataset;
+			}else{
+			$scope.tracks_data.dataset = _.union($scope.tracks_data.dataset,res.dataset);
+			}
+			
+            $scope.tracks_data.page = res.page;
+		});
+        
+   };
+   
+   $scope.play = function(track){
+   $('.segmented-control > a').removeClass('active');
+		$('.segmented-control > a#playtab').addClass('active');
+     $scope.playpage = true;
+   $scope.activeTrack = track;	  
+   $scope.activeTrack.track_url = $sce.trustAsResourceUrl(track.track_url+"/download");
+   
+   };
+   
+   $scope.search = function(query){
+      
+	  $scope.songs({q:query},1);
+	  $('#search').removeClass('active');
+	  $location.path("/songs");
+	  
+   
+   };
+
+    
+
+
+});
+
+
+fma.factory("fmaService",function($http){
+
+    var api_obj = {'api_key':api_key};
+  return {
+			genres:function(data){
+						var para = $.extend(data,api_obj);
+						
+						var req = $http({
+							method:"get",
+							url:base_url+"/genres.json",
+							params:para
+						});
+						return req;
+			},
+			artists: function(data){
+						var para = $.extend(data,api_obj);
+						var req = $http({
+							method:"get",
+							url: base_url+"/artists.json",
+							params:para
+						});
+						return req;
+				},
+			albums: function(data){
+						var para = $.extend(data,api_obj);
+						var req = $http({
+							method:"get",
+							url:base_url+"/albums.json",
+							params:para							
+						});
+						return req;
+				},
+			tracks:function(data){
+				var para = $.extend(data,api_obj);
+						var req = $http({
+							method:"get",
+							url:base_url+"/tracks.json",
+							params:para							
+						});
+						return req;
+			},			
+		};
+
+
+});
+
+</script>
+  </body>
+</html>

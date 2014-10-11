@@ -1,0 +1,15 @@
+
+        <ul class="table-view" ng-init="artists()">
+          <li ng-repeat="artist in artists_data.dataset track by $index" class="table-view-cell media">
+            <a   ng-click="songs(artist)" class="navigate-right" href="#songs" data-transition="slide-in">
+              <strong>{{ artist.artist_name }}</strong>
+			 
+            </a>
+            
+          </li>
+          <li  ng-show="artists_data.total_pages > artists_data.page" class="table-view-cell media">
+		  <a ng-click="artists(artists_data.page+1)"  ><strong >More</strong></a>
+		  
+		  </li>
+        </ul>
+      

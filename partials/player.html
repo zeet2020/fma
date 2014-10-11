@@ -1,0 +1,22 @@
+<form >
+  <div class="content-padded">
+  <h4>{{ activeTrack.track_title }}</h4>
+  <img class="media-object pull-left" ng-src="{{ activeTrack.track_image_file }}" width="100%" >
+  <audio controls ng-src="{{ activeTrack.track_url }}" autoplay></audio>
+  </div>
+  <div class="card">
+  <ul class="table-view">
+    <li class="table-view-cell"><b>Album:</b>{{ activeTrack.album_title }}</li>
+    <li class="table-view-cell"><b>Artist:</b>{{ activeTrack.artist_name }}</li>
+    
+    <li class="table-view-cell"><b>Listens:</b>{{ activeTrack.track_listens }}</li>
+    <li class="table-view-cell"><img ng-src="{{ activeTrack.license_image_file }}" /></li>
+  </ul>
+</div>
+
+</form>
+<style>
+audio {
+width:100%;
+}
+</style>

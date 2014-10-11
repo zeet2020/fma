@@ -1,0 +1,20 @@
+<ul class="table-view" >
+          <li ng-repeat="track in tracks_data.dataset track by $index" class="table-view-cell media">
+			
+            <a   ng-click="play(track)" class="navigate-right" href="#play" data-transition="slide-in">
+			<img width="10%" class="media-object pull-left" ng-src="{{ track.track_image_file }}">
+			<div class="media-body">
+              <strong >{{ track.track_title }}</strong>
+			  <p>Duration :{{ track.track_duration }}</p>
+			  <p>Album Title :{{ track.album_title }}</p>
+			  <p>Artist Name :{{ track.artist_name }}</p>
+            </div>			  
+            </a>           
+          </li>
+		  
+          <li  ng-show="tracks_data.total_pages > tracks_data.page" class="table-view-cell media">
+		  <a ng-click="songs(activeSongParamObj,tracks_data.page+1)"  ><strong >More</strong></a>
+		  
+		  </li>
+        </ul>
+      

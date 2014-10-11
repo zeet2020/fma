@@ -1,0 +1,13 @@
+
+<ul class="table-view" ng-init="genres()">
+          <li ng-repeat="genre in genres_data.dataset track by $index" class="table-view-cell media">
+            <a   ng-click="songs(genre)" class="navigate-right" href="#songs" data-transition="slide-in">
+              <strong style="color:{{genre.genre_color}}">{{ genre.genre_title }}</strong>			 
+            </a>           
+          </li>
+          <li  ng-show="genres_data.total_pages > genres_data.page" class="table-view-cell media">
+		  <a ng-click="genres(genres_data.page+1)"  ><strong >More</strong></a>
+		  
+		  </li>
+        </ul>
+      

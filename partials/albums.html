@@ -1,0 +1,15 @@
+
+        <ul class="table-view" ng-init="albums()">
+          <li ng-repeat="album in albums_data.dataset track by $index" class="table-view-cell media">
+            <a ng-click="songs(album)" class="navigate-right" href="#songs" data-transition="slide-in">
+              <strong>{{ album.album_title }}</strong>
+			 
+            </a>
+            
+          </li>
+          <li  ng-show="albums_data.total_pages > albums_data.page" class="table-view-cell media">
+		  <a ng-click="albums(albums_data.page+1)"  ><strong >More</strong></a>
+		  
+		  </li>
+        </ul>
+      
